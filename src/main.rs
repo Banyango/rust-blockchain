@@ -6,6 +6,7 @@ extern crate router;
 extern crate serde_json;
 extern crate serde;
 extern crate bodyparser;
+extern crate pad;
 #[macro_use] 
 extern crate serde_derive;
 #[macro_use] 
@@ -21,8 +22,10 @@ mod miner;
 lazy_static! {
     static ref BLOCKCHAIN: Mutex<Vec<block::Block>> = {
         Mutex::new(Vec::new())
-    };
+    };    
 }
+
+static DIFFICULTY: i64 = 1;
 
 fn push_block(block: block::Block) {
     BLOCKCHAIN.lock().unwrap().push(block);
@@ -42,7 +45,9 @@ fn main() {
         timestamp: time::get_time().sec.to_string(),
         bpm:0,
         hash:Some(String::from("")),
-        prev_hash:String::from("")
+        prev_hash:String::from(""),
+        difficulty:0,
+        nonce:String::from(""),
     };
 
     println!("Server Started...");
@@ -80,7 +85,7 @@ fn handle_write_block(req: &mut Request) -> IronResult<Response> {
                     match value.as_i64() {
                         Some(bpm) => {
                             println!("{}",value);
-                            match miner::generate_block(&chain[chain.len()-1], bpm) {
+                            match miner::generate_block(&chain[chain.len()-1], bpm, DIFFICULTY) {
                                 Ok(result) => {
                                     println!("Block was generated {}", result);
                                     

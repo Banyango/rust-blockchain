@@ -7,7 +7,9 @@ pub struct Block {
     pub timestamp:String,
     pub bpm:i64,
     pub hash:Option<String>,
-    pub prev_hash:String
+    pub prev_hash:String,
+    pub nonce:String,
+    pub difficulty: i64,
 }
 
 impl fmt::Display for Block {
