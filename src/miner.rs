@@ -4,7 +4,6 @@ use crypto::digest::Digest;
 use pad::{PadStr, Alignment};
 
 pub fn calculate_hash(block: &Block) -> String {
-    // let record = self.index.to_string().push_str(&block.timestamp).push(self.bpm.to_string());
     let record = [block.index.to_string(), block.timestamp.clone(), block.bpm.to_string(), block.prev_hash.clone(), block.nonce.clone()].concat();
 
     let mut hasher = Sha256::new();
@@ -15,7 +14,7 @@ pub fn calculate_hash(block: &Block) -> String {
 }   
 
 pub fn is_hash_valid(hash:&String, difficulty: i64) -> bool {
-    let prefix = "".pad(1, '0', Alignment::Right, true);
+    let prefix = "".pad(difficulty as usize, '0', Alignment::Right, true);
     
     hash.starts_with(&prefix)
 }
@@ -79,6 +78,8 @@ pub fn generate_block(old_block: &Block, bpm: i64, difficulty: i64) -> Result<Bl
     Ok(block)
 }
 
+// this function would be used when networking is hooked up.
+#[allow(dead_code)]
 pub fn should_replace_chain(new_blocks: &[Block], old_blocks: &[Block]) -> bool {
     if new_blocks.len() > old_blocks.len() {
         return true;
@@ -152,5 +153,35 @@ mod tests {
         };
 
         assert_eq!(is_block_valid(&new, &old), false);
+    }
+    
+    #[test]
+    fn test_is_hash_valid_invalid_hash() {
+        
+        let hash = String::from("1asdf9823f90a23f23f");
+
+        assert_eq!(is_hash_valid(&hash, 1), false, "hash with 0 leading 0 should be invalid on 1 difficulty");
+
+        let hash = String::from("1asdf9823f90a23f23f");
+
+        assert_eq!(is_hash_valid(&hash, 2), false, "hash with 0 leading 0 should be invalid on 2 difficulty");
+
+        let hash = String::from("01asdf9823f90a23f23f");
+
+        assert_eq!(is_hash_valid(&hash, 2), false, "hash with 1 leading 0 should be invalid on 2 difficulty");
+        
+    }
+    
+    #[test]
+    fn test_is_hash_valid_valid_hash() {
+        
+        let hash = String::from("01asdf9823f90a23f23f");
+
+        assert_eq!(is_hash_valid(&hash, 1), true, "hash with 1 leading 0 should be valid on 1 difficulty");
+
+        let hash = String::from("00sdf9823f90a23f23f");
+
+        assert_eq!(is_hash_valid(&hash, 2), true, "hash with 2 leading 0 should be valid on 2 difficulty");
+
     }
 }

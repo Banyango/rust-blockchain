@@ -32,7 +32,3 @@ impl fmt::Display for Block {
         write!(f, "({})", result.unwrap())
     }
 }
-
-pub struct BlockChain {
-    pub chain: Vec<Block>
-}

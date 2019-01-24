@@ -56,7 +56,7 @@ fn main() {
     Iron::new(router).http("localhost:3000").unwrap();
 }
 
-fn handler(req: &mut Request) -> IronResult<Response> {
+fn handler(_req: &mut Request) -> IronResult<Response> {
     let chain = &*BLOCKCHAIN.lock().unwrap();
 
     let output = serde_json::to_string(&chain);
@@ -87,7 +87,7 @@ fn handle_write_block(req: &mut Request) -> IronResult<Response> {
                                         println!("block is valid {}", result);
 
                                         let output = serde_json::to_string(&result);
-                                        
+
                                         chain.push(result);      
                                         
                                         match output {
