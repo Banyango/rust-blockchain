@@ -31,12 +31,6 @@ fn push_block(block: block::Block) {
     BLOCKCHAIN.lock().unwrap().push(block);
 }
 
-fn do_for_blocks<F>(closure: F) where F : Fn(&block::Block) {
-    for block in &*BLOCKCHAIN.lock().unwrap() {
-        closure(block);
-    }
-}
-
 fn main() {
         
     println!("Creating Genesis Block...");

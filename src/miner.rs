@@ -89,6 +89,7 @@ pub fn should_replace_chain(new_blocks: &[Block], old_blocks: &[Block]) -> bool 
 #[cfg(test)]
 mod tests {   
     use super::*; 
+    use super::super::block::Block;
     use pad::{PadStr, Alignment};
     #[test]
     fn test_is_hash_valid() {
@@ -99,5 +100,57 @@ mod tests {
     fn test_prefix() {
         let prefix = "".pad(1, '0', Alignment::Right, true);
         assert_eq!(prefix, "0");
+    }
+    
+    #[test]
+    fn test_is_block_valid_index_wrong() {
+        
+        let old = Block {
+            index:2,
+             ..Default::default()
+        };
+        
+        let new = Block {
+            index:1,
+             ..Default::default()
+        };
+
+        assert_eq!(is_block_valid(&new, &old), false);
+    }
+
+    #[test]
+    fn test_is_block_valid_prev_hash_not_equal_to_hash() {
+        
+        let old = Block {
+            index:0,
+            hash:Some(String::from("1")),
+             ..Default::default()
+        };
+        
+        let new = Block {
+            index:1,
+            prev_hash:String::from("2"),
+             ..Default::default()
+        };
+
+        assert_eq!(is_block_valid(&new, &old), false);
+    }
+
+    #[test]
+    fn test_is_block_valid_new_hash_is_none() {
+        
+        let old = Block {
+            index:0,
+            hash:Some(String::from("1")),
+             ..Default::default()
+        };
+        
+        let new = Block {
+            index:1,
+            hash:None,
+             ..Default::default()
+        };
+
+        assert_eq!(is_block_valid(&new, &old), false);
     }
 }
